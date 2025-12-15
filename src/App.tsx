@@ -1,10 +1,10 @@
-import Index from './Component'
+import NavBar from "./Component/NavBar"
 
 function App() {
 
   return (
     <>
-      <Index />
+      <NavBar />
     </>
   )
 }
