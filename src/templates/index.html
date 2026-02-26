@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MsPlaco | Expert BA13 & Cloisons Sèches</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --gold: #C9A84C;
+            --dark: #0f0f0f;
+            --gray: #1a1a1a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: #e5e5e5;
+            font-family: 'DM Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        .bebas {
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 0.04em;
+        }
+
+        /* ── NOISE TEXTURE OVERLAY ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.35;
+        }
+
+        /* ── CURSOR ── */
+        .cursor {
+            width: 12px;
+            height: 12px;
+            background: var(--gold);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.15s ease;
+            mix-blend-mode: difference;
+        }
+
+        .cursor-ring {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--gold);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            transition: all 0.35s ease;
+            opacity: 0.5;
+        }
+
+        /* ── NAVBAR ── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1.5rem 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            background: rgba(15, 15, 15, 0.7);
+            border-bottom: 1px solid rgba(201, 168, 76, 0.1);
+        }
+
+        .nav-logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            color: var(--gold);
+            letter-spacing: 0.1em;
+        }
+
+        .nav-links a {
+            color: #aaa;
+            text-decoration: none;
+            margin-left: 2rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--gold);
+        }
+
+        .lang-switch {
+            color: #aaa;
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            border: 1px solid #333;
+            padding: 0.3rem 0.8rem;
+            margin-left: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .lang-switch:hover {
+            color: var(--gold);
+            border-color: var(--gold);
+        }
+
+        /* ── HERO ── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 0 5%;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(135deg, rgba(201, 168, 76, 0.06) 0%, transparent 60%),
+                repeating-linear-gradient(90deg,
+                    transparent,
+                    transparent 80px,
+                    rgba(201, 168, 76, 0.03) 80px,
+                    rgba(201, 168, 76, 0.03) 81px),
+                repeating-linear-gradient(0deg,
+                    transparent,
+                    transparent 80px,
+                    rgba(201, 168, 76, 0.03) 80px,
+                    rgba(201, 168, 76, 0.03) 81px);
+        }
+
+        .hero-tag {
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--gold);
+            border: 1px solid rgba(201, 168, 76, 0.4);
+            padding: 0.4rem 1rem;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(4rem, 10vw, 9rem);
+            line-height: 0.92;
+            color: #fff;
+        }
+
+        .hero h1 span {
+            color: var(--gold);
+        }
+
+        .hero-sub {
+            max-width: 440px;
+            font-size: 1rem;
+            color: #888;
+            line-height: 1.7;
+            margin-top: 1.5rem;
+        }
+
+        .hero-cta {
+            margin-top: 2.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background: var(--gold);
+            color: #0f0f0f;
+            padding: 0.85rem 2rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background: #e0bc5e;
+            transform: translateY(-2px);
+        }
+
+        .btn-ghost {
+            color: #aaa;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-bottom: 1px solid #333;
+            padding-bottom: 2px;
+            transition: all 0.3s;
+        }
+
+        .btn-ghost:hover {
+            color: var(--gold);
+            border-color: var(--gold);
+        }
+
+        /* vertical line decoration */
+        .hero-deco {
+            position: absolute;
+            right: 10%;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hero-deco-line {
+            width: 1px;
+            height: 120px;
+            background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+        }
+
+        .hero-deco span {
+            font-size: 0.65rem;
+            letter-spacing: 0.3em;
+            color: var(--gold);
+            writing-mode: vertical-rl;
+        }
+
+        /* ── STATS BAR ── */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border-top: 1px solid #222;
+            border-bottom: 1px solid #222;
+        }
+
+        .stat-item {
+            padding: 2rem;
+            border-right: 1px solid #222;
+            text-align: center;
+        }
+
+        .stat-item:last-child {
+            border-right: none;
+        }
+
+        .stat-num {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3.5rem;
+            color: var(--gold);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #666;
+            margin-top: 0.3rem;
+        }
+
+        /* ── SERVICES ── */
+        .section-tag {
+            font-size: 0.7rem;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 0.8rem;
+        }
+
+        .section-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            color: #fff;
+            line-height: 1;
+        }
+
+        .service-card {
+            background: var(--gray);
+            border: 1px solid #2a2a2a;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.4s, transform 0.4s;
+            cursor: default;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--gold);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .service-card:hover {
+            border-color: rgba(201, 168, 76, 0.3);
+            transform: translateY(-6px);
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .service-card h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.6rem;
+            color: #fff;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        .service-card p {
+            color: #777;
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .service-num {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3.5rem;
+            color: rgba(201, 168, 76, 0.07);
+            line-height: 1;
+        }
+
+        /* ── GALLERY ── */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            grid-template-rows: 280px 280px;
+            gap: 8px;
+        }
+
+        .gallery-item {
+            background: #1c1c1c;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .gallery-item:first-child {
+            grid-row: 1 / 3;
+        }
+
+        .gallery-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a1a 0%, #222 100%);
+            color: #444;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            gap: 0.5rem;
+            transition: background 0.4s;
+        }
+
+        .gallery-item:hover .gallery-placeholder {
+            background: linear-gradient(135deg, #222 0%, #2a2a2a 100%);
+        }
+
+        .gallery-item::after {
+            content: 'Voir projet';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(201, 168, 76, 0.9);
+            color: #0f0f0f;
+            text-align: center;
+            padding: 0.7rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            font-weight: 600;
+            transform: translateY(100%);
+            transition: transform 0.35s ease;
+        }
+
+        .gallery-item:hover::after {
+            transform: translateY(0);
+        }
+
+        /* ── PROCESS ── */
+        .process-step {
+            display: flex;
+            gap: 2rem;
+            padding: 2rem 0;
+            border-bottom: 1px solid #1e1e1e;
+            align-items: flex-start;
+        }
+
+        .process-step:last-child {
+            border-bottom: none;
+        }
+
+        .step-num {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4rem;
+            color: rgba(201, 168, 76, 0.2);
+            line-height: 1;
+            min-width: 70px;
+            transition: color 0.3s;
+        }
+
+        .process-step:hover .step-num {
+            color: var(--gold);
+        }
+
+        .step-content h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-content p {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        /* ── CONTACT ── */
+        .contact-section {
+            background: var(--gray);
+            border: 1px solid #2a2a2a;
+            padding: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-section::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            right: -80px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(201, 168, 76, 0.08) 0%, transparent 70%);
+        }
+
+        .contact-form input,
+        .contact-form textarea,
+        .contact-form select {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid #2a2a2a;
+            color: #e5e5e5;
+            padding: 0.9rem 1.2rem;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            transition: border-color 0.3s;
+            outline: none;
+            margin-bottom: 1rem;
+        }
+
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            border-color: rgba(201, 168, 76, 0.5);
+        }
+
+        .contact-form textarea {
+            min-height: 130px;
+            resize: vertical;
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            border-top: 1px solid #1e1e1e;
+            padding: 2.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        footer p {
+            color: #444;
+            font-size: 0.8rem;
+        }
+
+        /* ── MOBILE ── */
+        @media (max-width: 768px) {
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto;
+            }
+
+            .gallery-item:first-child {
+                grid-row: auto;
+            }
+
+            nav .nav-links {
+                display: none;
+            }
+
+            .contact-section {
+                padding: 2rem;
+            }
+
+            footer {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+
+        /* scroll reveal default state */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
+    <!-- NAVBAR -->
+    <nav id="navbar">
+        <div class="nav-logo">Ms<span style="color:#fff;">Placo</span></div>
+        <div class="nav-links">
+            <a href="#services">Services</a>
+            <a href="#gallery">Réalisations</a>
+            <a href="#process">Processus</a>
+            <a href="#contact">Contact</a>
+            <a href="/set-lang/ar" class="lang-switch">AR 🇲🇦</a>
+        </div>
+        <a href="#contact" class="btn-primary" style="padding:0.6rem 1.4rem; font-size:0.75rem;">Devis Gratuit</a>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="home">
+        <div class="hero-bg"></div>
+        <div style="position:relative; z-index:1; max-width: 900px;">
+            <div class="hero-tag" id="hero-tag">Expert en Plâtrerie Sèche</div>
+            <h1 id="hero-title">
+                EXPERT<br>
+                <span>PLACO</span><br>
+                BA13
+            </h1>
+            <p class="hero-sub" id="hero-sub">
+                Cloisons sèches, plafonds suspendus, isolation phonique et thermique.
+                Une finition irréprochable pour vos chantiers résidentiels et commerciaux.
+            </p>
+            <div class="hero-cta" id="hero-cta">
+                <a href="#contact" class="btn-primary">Demander un Devis</a>
+                <a href="#gallery" class="btn-ghost">Voir les Réalisations →</a>
+            </div>
+        </div>
+        <div class="hero-deco" id="hero-deco">
+            <div class="hero-deco-line"></div>
+            <span>Artisan Certifié</span>
+            <div class="hero-deco-line"></div>
+        </div>
+    </section>
+
+    <!-- STATS BAR -->
+    <div class="stats-bar">
+        <div class="stat-item reveal">
+            <div class="stat-num" data-count="150">0</div>
+            <div class="stat-label">Projets Réalisés</div>
+        </div>
+        <div class="stat-item reveal">
+            <div class="stat-num" data-count="8">0</div>
+            <div class="stat-label">Années d'Expérience</div>
+        </div>
+        <div class="stat-item reveal">
+            <div class="stat-num" data-count="100">0</div>
+            <div class="stat-label">% Clients Satisfaits</div>
+        </div>
+        <div class="stat-item reveal">
+            <div class="stat-num" data-count="24">0</div>
+            <div class="stat-label">Heures de Réponse</div>
+        </div>
+    </div>
+
+    <!-- SERVICES -->
+    <section id="services" style="padding: 8rem 5%;">
+        <div
+            style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4rem; flex-wrap: wrap; gap: 2rem;">
+            <div>
+                <div class="section-tag reveal">Ce que nous faisons</div>
+                <h2 class="section-title reveal">NOS<br>SERVICES</h2>
+            </div>
+            <p style="max-width: 340px; color: #666; font-size: 0.9rem; line-height: 1.8;" class="reveal">
+                Nous intervenons sur tous types de chantiers avec du matériau Placo® BA13 certifié,
+                pour des résultats durables et esthétiques.
+            </p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+            <div class="service-card reveal">
+                <div class="service-num">01</div>
+                <div class="service-icon">🏗️</div>
+                <h3>Cloisons Sèches</h3>
+                <p>Création et pose de cloisons Placo BA13 pour séparer et aménager vos espaces intérieurs avec
+                    précision.</p>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-num">02</div>
+                <div class="service-icon">🔲</div>
+                <h3>Plafonds Suspendus</h3>
+                <p>Installation de faux-plafonds en plaques BA13 pour un rendu lisse, moderne, avec intégration
+                    d'éclairage.</p>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-num">03</div>
+                <div class="service-icon">🔇</div>
+                <h3>Isolation Phonique</h3>
+                <p>Solutions d'isolation acoustique haute performance pour appartements, bureaux et studios
+                    d'enregistrement.</p>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-num">04</div>
+                <div class="service-icon">🌡️</div>
+                <h3>Isolation Thermique</h3>
+                <p>Doublage mur et isolation des combles avec laine de verre ou laine de roche sous plaque Placo BA13.
+                </p>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-num">05</div>
+                <div class="service-icon">🔧</div>
+                <h3>Rénovation</h3>
+                <p>Remplacement et réfection complète de cloisons vétustes. Remise en état pour vente ou location.</p>
+            </div>
+            <div class="service-card reveal">
+                <div class="service-num">06</div>
+                <div class="service-icon">✅</div>
+                <h3>Finitions & Enduits</h3>
+                <p>Enduisage, ponçage, et bandes à joints pour un mur parfaitement lisse, prêt à peindre ou tapisser.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section id="gallery" style="padding: 4rem 5% 8rem;">
+        <div style="margin-bottom: 3rem;">
+            <div class="section-tag reveal">Nos travaux</div>
+            <h2 class="section-title reveal">RÉALISATIONS</h2>
+        </div>
+        <div class="gallery-grid reveal">
+            <div class="gallery-item">
+                <div class="gallery-placeholder">
+                    <span style="font-size:2rem;">🏠</span>
+                    <span>Appartement Résidentiel</span>
+                    <span style="color:#333; font-size:0.7rem;">120m² · Paris 15e</span>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <div class="gallery-placeholder">
+                    <span style="font-size:1.8rem;">🏢</span>
+                    <span>Bureau Open Space</span>
+                    <span style="color:#333; font-size:0.7rem;">350m² · La Défense</span>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <div class="gallery-placeholder">
+                    <span style="font-size:1.8rem;">🛁</span>
+                    <span>Salle de Bain</span>
+                    <span style="color:#333; font-size:0.7rem;">Hydrofuge BA13</span>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <div class="gallery-placeholder">
+                    <span style="font-size:1.8rem;">🎙️</span>
+                    <span>Studio Son</span>
+                    <span style="color:#333; font-size:0.7rem;">Isolation totale</span>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <div class="gallery-placeholder">
+                    <span style="font-size:1.8rem;">🏫</span>
+                    <span>École Rénovée</span>
+                    <span style="color:#333; font-size:0.7rem;">Chantier public</span>
+                </div>
+            </div>
+        </div>
+        <p style="color:#444; font-size:0.8rem; text-align:center; margin-top:1.5rem; letter-spacing:0.1em;">
+            → Remplacez ces blocs par vos vraies photos de chantier
+        </p>
+    </section>
+
+    <!-- PROCESS -->
+    <section id="process"
+        style="padding: 4rem 5% 8rem; background: var(--gray); border-top: 1px solid #1e1e1e; border-bottom: 1px solid #1e1e1e;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: start; flex-wrap: wrap;">
+            <div>
+                <div class="section-tag reveal">Comment ça marche</div>
+                <h2 class="section-title reveal">NOTRE<br>PROCESSUS</h2>
+                <p style="color:#666; margin-top:1.5rem; line-height:1.8; font-size:0.9rem;" class="reveal">
+                    De la prise de contact jusqu'à la livraison finale, nous vous accompagnons à chaque étape avec
+                    transparence et professionnalisme.
+                </p>
+            </div>
+            <div>
+                <div class="process-step reveal">
+                    <div class="step-num">01</div>
+                    <div class="step-content">
+                        <h3>Prise de Contact</h3>
+                        <p>Appelez-nous ou remplissez le formulaire. Nous répondons sous 24h pour convenir d'un
+                            rendez-vous.</p>
+                    </div>
+                </div>
+                <div class="process-step reveal">
+                    <div class="step-num">02</div>
+                    <div class="step-content">
+                        <h3>Devis Gratuit</h3>
+                        <p>Visite sur chantier et évaluation précise. Devis détaillé et transparent sans frais ni
+                            engagement.</p>
+                    </div>
+                </div>
+                <div class="process-step reveal">
+                    <div class="step-num">03</div>
+                    <div class="step-content">
+                        <h3>Planification</h3>
+                        <p>Définition des dates d'intervention en accord avec votre planning. Fourniture de tous les
+                            matériaux.</p>
+                    </div>
+                </div>
+                <div class="process-step reveal">
+                    <div class="step-num">04</div>
+                    <div class="step-content">
+                        <h3>Réalisation & Livraison</h3>
+                        <p>Exécution soignée dans les délais convenus. Nettoyage complet et remise des clés à la fin.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" style="padding: 8rem 5%;">
+        <div style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 5rem; align-items: start; flex-wrap: wrap;">
+            <div>
+                <div class="section-tag reveal">Parlons de votre projet</div>
+                <h2 class="section-title reveal">DEMANDEZ<br>VOTRE<br>DEVIS</h2>
+                <p style="color:#666; margin-top:1.5rem; line-height:1.8; font-size:0.9rem;" class="reveal">
+                    Intervention rapide à Agadir, Drargua et régions limitrophes. Particuliers, promoteurs et
+                    entreprises
+                    du bâtiment bienvenus.
+                </p>
+                <div style="margin-top:2.5rem; display:flex; flex-direction:column; gap:1rem;" class="reveal">
+                    <div style="display:flex; align-items:center; gap:1rem; color:#888; font-size:0.9rem;">
+                        <span style="color:var(--gold);">📞</span> +33 6 XX XX XX XX
+                    </div>
+                    <div style="display:flex; align-items:center; gap:1rem; color:#888; font-size:0.9rem;">
+                        <span style="color:var(--gold);">✉️</span> <a href="/cdn-cgi/l/email-protection"
+                            class="__cf_email__"
+                            data-cfemail="7d1e1213091c1e093d0d111c1e120d0f12531b0f">[email&#160;protected]</a>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:1rem; color:#888; font-size:0.9rem;">
+                        <span style="color:var(--gold);">📍</span> Agadir - Drargua, 80650
+                    </div>
+                </div>
+            </div>
+            <div class="contact-section reveal">
+                <!-- Flash messages from Flask -->
+                <div id="flash-msg" style="display:none; padding:1rem; margin-bottom:1rem; font-size:0.85rem;"></div>
+
+                <form class="contact-form" id="contactForm" action="/send-contact" method="POST">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label
+                                style="font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:#555; display:block; margin-bottom:0.5rem;">Prénom</label>
+                            <input type="text" name="first_name" placeholder="Mohammed" required />
+                        </div>
+                        <div>
+                            <label
+                                style="font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:#555; display:block; margin-bottom:0.5rem;">Nom</label>
+                            <input type="text" name="last_name" placeholder="Alami" required />
+                        </div>
+                    </div>
+                    <label
+                        style="font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:#555; display:block; margin-bottom:0.5rem;">Email</label>
+                    <input type="email" name="email" placeholder="vous@email.com" required />
+                    <label
+                        style="font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:#555; display:block; margin-bottom:0.5rem;">Téléphone
+                        (optionnel)</label>
+                    <input type="tel" name="phone" placeholder="+33 6 XX XX XX XX" />
+                    <label
+                        style="font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:#555; display:block; margin-bottom:0.5rem;">Type
+                        de projet</label>
+                    <select name="project"
+                        style="margin-bottom:1rem; background:#1a1a1a; border:1px solid #2a2a2a; color:#aaa; padding:0.9rem 1.2rem; width:100%; font-family:'DM Sans',sans-serif;">
+                        <option>Cloisons sèches</option>
+                        <option>Plafond suspendu</option>
+                        <option>Isolation phonique</option>
+                        <option>Isolation thermique</option>
+                        <option>Rénovation complète</option>
+                        <option>Autre</option>
+                    </select>
+                    <label
+                        style="font-size:0.72rem; letter-spacing:0.15em; text-transform:uppercase; color:#555; display:block; margin-bottom:0.5rem;">Description
+                        du projet</label>
+                    <textarea name="description"
+                        placeholder="Décrivez votre chantier : superficie, type de bâtiment, délais souhaités..."></textarea>
+                    <button type="submit" id="submitBtn" class="btn-primary"
+                        style="width:100%; text-align:center; font-size:0.85rem;">
+                        Envoyer la Demande →
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="nav-logo" style="font-size:1.4rem;">Ms<span style="color:#fff;">Placo</span></div>
+        <p>© 2025 MsPlaco · Expert BA13 & Plâtrerie Sèche · Tous droits réservés</p>
+        <div style="display:flex; gap:1.5rem;">
+            <a href="#"
+                style="color:#444; font-size:0.75rem; text-decoration:none; letter-spacing:0.1em; text-transform:uppercase;">Mentions</a>
+            <a href="#"
+                style="color:#444; font-size:0.75rem; text-decoration:none; letter-spacing:0.1em; text-transform:uppercase;">CGV</a>
+        </div>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // ── CUSTOM CURSOR ──
+        const cursor = document.getElementById('cursor');
+        const ring = document.getElementById('cursorRing');
+        document.addEventListener('mousemove', (e) => {
+            gsap.to(cursor, { x: e.clientX - 6, y: e.clientY - 6, duration: 0.1 });
+            gsap.to(ring, { x: e.clientX - 18, y: e.clientY - 18, duration: 0.35 });
+        });
+
+        // ── HERO ANIMATION ──
+        const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+        tl.from('#hero-tag', { y: 30, opacity: 0, duration: 0.7 })
+            .from('#hero-title', { y: 80, opacity: 0, duration: 1, skewY: 4 }, '-=0.3')
+            .from('#hero-sub', { y: 40, opacity: 0, duration: 0.8 }, '-=0.5')
+            .from('#hero-cta', { y: 30, opacity: 0, duration: 0.7 }, '-=0.4')
+            .from('#hero-deco', { opacity: 0, x: 30, duration: 1 }, '-=0.8');
+
+        // ── SCROLL REVEALS ──
+        gsap.utils.toArray('.reveal').forEach((el, i) => {
+            gsap.to(el, {
+                scrollTrigger: {
+                    trigger: el,
+                    start: 'top 88%',
+                    toggleActions: 'play none none none'
+                },
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                delay: (i % 4) * 0.08,
+                ease: 'power2.out'
+            });
+        });
+
+        // ── COUNTER ANIMATION ──
+        gsap.utils.toArray('[data-count]').forEach(el => {
+            const target = +el.dataset.count;
+            ScrollTrigger.create({
+                trigger: el,
+                start: 'top 85%',
+                onEnter: () => {
+                    gsap.to({ val: 0 }, {
+                        val: target,
+                        duration: 2,
+                        ease: 'power2.out',
+                        onUpdate: function () {
+                            el.textContent = Math.round(this.targets()[0].val);
+                        }
+                    });
+                }
+            });
+        });
+
+        // ── NAVBAR SCROLL ──
+        ScrollTrigger.create({
+            start: 'top -80',
+            onUpdate: (self) => {
+                document.getElementById('navbar').style.background =
+                    self.progress > 0 ? 'rgba(15,15,15,0.95)' : 'rgba(15,15,15,0.7)';
+            }
+        });
+
+        // ── CONTACT FORM (AJAX) ──
+        document.getElementById('contactForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const flash = document.getElementById('flash-msg');
+
+            btn.textContent = 'Envoi en cours...';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+
+            try {
+                const res = await fetch('/send-contact', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: new FormData(this)
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    flash.style.display = 'block';
+                    flash.style.background = 'rgba(42,122,79,0.2)';
+                    flash.style.border = '1px solid #2a7a4f';
+                    flash.style.color = '#4ade80';
+                    flash.textContent = '✓ ' + data.message;
+                    gsap.from(flash, { y: -10, opacity: 0, duration: 0.4 });
+                    this.reset();
+                    btn.textContent = '✓ Envoyé !';
+                    btn.style.background = '#2a7a4f';
+                    btn.style.opacity = '1';
+                } else {
+                    flash.style.display = 'block';
+                    flash.style.background = 'rgba(180,40,40,0.2)';
+                    flash.style.border = '1px solid #b42828';
+                    flash.style.color = '#f87171';
+                    flash.textContent = '✗ ' + (data.errors || ['Erreur inconnue.']).join(' ');
+                    btn.textContent = 'Envoyer la Demande →';
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.background = '';
+                }
+            } catch (err) {
+                flash.style.display = 'block';
+                flash.style.color = '#f87171';
+                flash.textContent = '✗ Erreur réseau. Veuillez réessayer.';
+                btn.textContent = 'Envoyer la Demande →';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
+        });
+        document.getElementById('contactForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const btn = this.querySelector('button');
+            btn.textContent = '✓ Message envoyé !';
+            btn.style.background = '#2a7a4f';
+            btn.style.opacity = '1';
+        });
+    </script>
+</body>
+
+</html>
