@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MsPlaco Admin – Connexion</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #0f0f0f;
+            color: #e5e5e5;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .login-box {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            padding: 3rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-box h1 {
+            font-size: 1.8rem;
+            color: #C9A84C;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .login-box p {
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+        }
+
+        label {
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #555;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid #2a2a2a;
+            color: #e5e5e5;
+            padding: 0.9rem 1.2rem;
+            font-size: 0.9rem;
+            outline: none;
+            margin-bottom: 1.5rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="password"]:focus {
+            border-color: rgba(201, 168, 76, 0.5);
+        }
+
+        button {
+            width: 100%;
+            background: #C9A84C;
+            color: #0f0f0f;
+            padding: 0.85rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #e0bc5e;
+        }
+
+        .error {
+            background: rgba(180, 40, 40, 0.15);
+            border: 1px solid #b42828;
+            color: #f87171;
+            padding: 0.8rem 1rem;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #555;
+            font-size: 0.8rem;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: #C9A84C;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-box">
+        <h1>MsPlaco</h1>
+        <p>Panneau d'administration</p>
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+        <form method="POST">
+            <label>Mot de passe</label>
+            <input type="password" name="password" placeholder="Entrez le mot de passe" required autofocus />
+            <button type="submit">Se connecter</button>
+        </form>
+        <a href="/" class="back-link">← Retour au site</a>
+    </div>
+</body>
+
+</html>
