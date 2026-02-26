@@ -1,4 +1,0 @@
-flask
-flask-mail
-python-dotenv
-gunicorn

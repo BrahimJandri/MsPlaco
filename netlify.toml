@@ -1,0 +1,14 @@
+[build]
+  publish = "public"
+
+# Redirect /ar to ar.html
+[[redirects]]
+  from = "/ar"
+  to = "/ar.html"
+  status = 200
+
+# SPA-style: serve index.html for unknown routes
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
