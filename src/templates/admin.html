@@ -138,6 +138,31 @@
             background: rgba(201, 168, 76, 0.03);
         }
 
+        tr.clickable {
+            cursor: pointer;
+        }
+
+        tr.detail-row td {
+            padding: 1rem 1.5rem;
+            background: #151515;
+            border-bottom: 2px solid #C9A84C;
+        }
+
+        .detail-label {
+            color: #888;
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+        }
+
+        .detail-text {
+            color: #e5e5e5;
+            font-size: 0.9rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
         .badge {
             display: inline-block;
             padding: 0.2rem 0.6rem;
@@ -297,7 +322,7 @@
             tbody.innerHTML = filtered.map(q => {
                 const nextStatus = statusOrder[Math.min(statusOrder.indexOf(q.status) + 1, statusOrder.length - 1)];
                 return `
-                <tr data-id="${q.id}">
+                <tr data-id="${q.id}" class="clickable" onclick="toggleDetail(${q.id})">
                     <td>${q.id}</td>
                     <td>${q.first_name} ${q.last_name}</td>
                     <td>${q.email}</td>
@@ -306,11 +331,24 @@
                     <td>${q.date}</td>
                     <td><span class="badge badge-${q.status}">${statusLabels[q.status]}</span></td>
                     <td>
-                        ${q.status !== 'archive' ? `<button class="action-btn" onclick="updateStatus(${q.id}, '${nextStatus}')">${statusLabels[nextStatus]} →</button>` : ''}
-                        <button class="action-btn delete" onclick="deleteQuote(${q.id})">✕</button>
+                        ${q.status !== 'archive' ? `<button class="action-btn" onclick="event.stopPropagation(); updateStatus(${q.id}, '${nextStatus}')">${statusLabels[nextStatus]} →</button>` : ''}
+                        <button class="action-btn delete" onclick="event.stopPropagation(); deleteQuote(${q.id})">✕</button>
+                    </td>
+                </tr>
+                <tr class="detail-row" id="detail-${q.id}" style="display:none;">
+                    <td colspan="8">
+                        <div class="detail-label">Description du projet</div>
+                        <div class="detail-text">${q.description || 'Aucune description fournie.'}</div>
                     </td>
                 </tr>`;
             }).join('');
+        }
+
+        function toggleDetail(id) {
+            const row = document.getElementById('detail-' + id);
+            if (row) {
+                row.style.display = row.style.display === 'none' ? '' : 'none';
+            }
         }
 
         async function updateStatus(id, status) {
