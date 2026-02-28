@@ -5,6 +5,7 @@ from functools import wraps
 import os
 import re
 import json
+import requests as http_requests
 from datetime import datetime
 from pathlib import Path
 
@@ -15,15 +16,18 @@ app.secret_key = os.getenv("SECRET_KEY", "change-this-secret-key")
 
 SUPPORTED_LANGS = ("fr", "ar")
 
+
 @app.before_request
 def set_lang():
     g.lang = session.get("lang", "fr")
+
 
 @app.route("/set-lang/<lang>")
 def set_language(lang):
     if lang in SUPPORTED_LANGS:
         session["lang"] = lang
     return redirect(request.referrer or url_for("home"))
+
 
 # ── MAIL CONFIG
 app.config["MAIL_SERVER"] = os.getenv("MAIL_SERVER", "smtp.gmail.com")
@@ -38,6 +42,46 @@ mail = Mail(app)
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
 QUOTES_FILE = Path("data/quotes.json")
 QUOTES_FILE.parent.mkdir(exist_ok=True)
+
+# ── CALLMEBOT WHATSAPP CONFIG
+# Your WhatsApp number (e.g. +212659715906)
+CALLMEBOT_PHONE = os.getenv("CALLMEBOT_PHONE")
+# API key received from CallMeBot
+CALLMEBOT_APIKEY = os.getenv("CALLMEBOT_APIKEY")
+
+
+def send_whatsapp_notification(first_name, last_name, email, phone, project, description, date):
+    """Send a WhatsApp message via CallMeBot when a new quote is received."""
+    if not CALLMEBOT_PHONE or not CALLMEBOT_APIKEY:
+        print(
+            "[WHATSAPP] Skipped – missing config (CALLMEBOT_PHONE or CALLMEBOT_APIKEY)")
+        return
+
+    message = (
+        f"📩 *Nouveau devis MsPlaco*\n"
+        f"──────────────────\n"
+        f"*Nom :* {first_name} {last_name}\n"
+        f"*Email :* {email}\n"
+        f"*Tel :* {phone}\n"
+        f"*Projet :* {project}\n"
+        f"*Date :* {date}\n"
+        f"──────────────────\n"
+        f"*Description :*\n{description}"
+    )
+    try:
+        resp = http_requests.get(
+            "https://api.callmebot.com/whatsapp.php",
+            params={
+                "phone": CALLMEBOT_PHONE,
+                "text": message,
+                "apikey": CALLMEBOT_APIKEY,
+            },
+            timeout=15,
+        )
+        resp.raise_for_status()
+        print(f"[WHATSAPP] Message sent successfully to {CALLMEBOT_PHONE}")
+    except Exception as e:
+        print(f"[WHATSAPP ERROR] {e}")
 
 
 def is_valid_email(email):
@@ -147,6 +191,10 @@ def send_contact():
         ))
     except Exception as e:
         print(f"[MAIL ERROR] {e}")
+
+    # Send WhatsApp notification
+    send_whatsapp_notification(
+        first_name, last_name, email, phone, project, description, now)
 
     if is_ajax:
         return jsonify({"success": True, "message": "Votre demande a bien ete envoyee ! Nous vous repondrons sous 24h."})
