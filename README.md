@@ -28,7 +28,7 @@ MsPlaco/
 ```
 
 ---
- 
+
 ## ✨ Fonctionnalités
 
 - **Bilingue** : Français + Arabe (RTL) avec basculement de langue
