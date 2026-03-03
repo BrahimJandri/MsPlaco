@@ -3,7 +3,7 @@
 Site professionnel bilingue (FR/AR) pour artisan plaquiste, avec **Flask backend** + **Netlify static hosting**.
 
 ---
-
+ 
 ## 📁 Structure du projet
 
 ```
